@@ -1,6 +1,6 @@
 #!/bin/bash
-## Ubuntu Minimal Desktop 10.04 "Zeptobuntu Update 2" by Anthony Veilleux and António PT
-## Version 10.04.2-2010.06.12
+## Minimal Desktop for Ubuntu 10.10 "Attobuntu" by the Minimal Desktop Team
+## Version 10.10-2010.09.22
 ## This script is licensed under GPL 3 (http://www.gnu.org/licenses/gpl-3.0.txt)
 ## http://ubuntu-minimal-desktop.blogspot.com/
 
@@ -8,15 +8,15 @@ if [ $UID -ne 0 ]; then
 	sudo $0
 else
 
-	echo -e "Welcome to the Ubuntu Minimal Desktop install script.\nI will now ask you some questions, to determine what software I should install.\nItems marked with an asterisk (*) are the default options.\nPress ENTER to continue."
+	echo -e "Welcome to the Minimal Desktop for Ubuntu install script.\nI will now ask you some questions, to determine what software I should install.\nItems marked with an asterisk (*) are the default options.\nPress ENTER to continue."
 	read dummy
 
-	echo -e "Which desktop environment would you like to install? If you do not know what\nthis means just hit Enter.\n1. GNOME*\n2. KDE"
+	echo -e "Which desktop environment would you like to install? If you do not know what\nthis means just hit Enter.\n1. GNOME*\n2. KDE\n3. Fluxbox"
 	read de
 
 	if [ "$de" = '2' ]; then
 
-		echo -e "Which browser would you like to install? (Konqueror will be installed as well.)\n1. None (just Konqueror)*\n2. Firefox\n3. Chromium\n4. Opera"
+		echo -e "Which browser would you like to install?\n1. Rekonq*\n2. Firefox\n3. Chromium\n4. Opera"
 		read browser
 
 		echo -e "Which Instant Messaging client would you like to install?\n1. Kopete*\n2. Konversation\n3. None"
@@ -41,7 +41,7 @@ else
 			if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
 				true
 			elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
-				echo -e "WARNING: This format is restricted in some counries. Are you sure you wish\nto continue? [y*|n]"
+				echo -e "WARNING: This format is restricted in some countries. Are you sure you wish\nto continue? [y*|n]"
 				read dvd
 			fi
 		fi
@@ -55,8 +55,8 @@ else
 
 		if [ "$browser" = '4' ]; then
 			echo "deb http://deb.opera.com/opera/ stable non-free" >> /etc/apt/sources.list
-			wget -o /dev/null -O archive.key http://deb.opera.com/archive.key
-			apt-key add archive.key && rm archive.key > /dev/null
+			wget -o /dev/null -O - http://deb.opera.com/archive.key | apt-key add -
+			echo -e "sleep 5m\nwget -O - http://deb.opera.com/archive.key | apt-key add -\nexit 0" > /etc/rc.local
 		fi
 
 		sed -i -e '/deb cdrom:/d' /etc/apt/sources.list
@@ -69,10 +69,10 @@ else
 		aptitude -y safe-upgrade > /dev/null
 
 		echo "* Installing X.org and the Linux Sound base system..."
-		aptitude -y install alsa-utils xorg > /dev/null
+		aptitude -y install alsa-utils xinit > /dev/null
 
 		echo "* Installing KDE and other essentials..."
-		sudo aptitude -y install kdm kdebase kdmtheme > /dev/null
+		sudo aptitude -y install kdm kdebase > /dev/null
 
 		echo "* Installing some important software..."
 		sudo aptitude -y install k3b kpackagekit kdeartwork jockey-kde okular > /dev/null
@@ -88,7 +88,7 @@ else
 			echo "* Installing Opera..." && echo "Opera" >> README
 			aptitude -y install opera > /dev/null
 		elif [ -z "$browser" ] || [ "$browser" = '1' ]; then
-			true
+			aptitude -y install reconq > /dev/null
 		fi
 		
 
@@ -145,15 +145,15 @@ else
 			echo "* Installing restricted extras..." && echo "Kubuntu restricted extras" >> README
 			aptitude -y install kubuntu-restricted-extras libdvdread4 > /dev/null
 			if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
-				true
-			elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
-				echo "  DVD playback support" >> README
-				ARCH="$(uname -m)"
-				if [ "$ARCH" = 'i686' ]; then
-					wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_i386.deb
-				else
-					wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_amd64.deb
-				fi
+					true
+				elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
+					echo "  DVD playback support" >> README
+					ARCH="$(uname -m |grep 64)"
+					if [ -z "$ARCH" ]; then
+						wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_i386.deb
+					else
+						wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_amd64.deb
+					fi
 				dpkg -i libdvdcss2.deb > /dev/null
 				rm libdvdcss2.deb
 			fi
@@ -163,9 +163,83 @@ else
 		aptitude -yf install > /dev/null
 		aptitude clean > /dev/null
 
-		echo -e "\nIf there are any problems with this script, please send an email to:\nAnthony_Veilleux@cs.uml.edu or acmps.pt@gmail.com\n\nIf you believe this script contains bugs, please report them in our Launchpad page:\nhttps://launchpad.net/ubuntu-desktop-minimal\n\nThanks for using this script!" >> README
+		echo -e "\nIf there are any problems with this script, please send an email to:\nAnthony_Veilleux@cs.uml.edu or acmps.pt@gmail.com\n\nIf you believe this script contains bugs, please report them in our Launchpad page:\nhttps://edge.launchpad.net/minimal-desktop-for-ubuntu\n\nThanks for using this script!" >> README
 
-		echo -e "Congratulations! Kubuntu Minimal Desktop has been installed. Please read the\nREADME generated by this script, located in your home folder. It contains some\nvery important information.\n\nA reboot is required to use your new system.\nWould you like to reboot now? [y*|n]"
+		echo -e "Congratulations! Minimal Desktop for Kubuntu has been installed. Please read\nthe README generated by this script, located in your home folder. It contains\nsome very important information.\n\nA reboot is required to use your new system.\nWould you like to reboot now? [y*|n]"
+		read reboot
+
+	elif [ "$de" = '3' ]; then
+
+		echo -e "Minimal Desktop for Fluxbuntu is recommended for experienced Linux users only.\nAre you sure you wish to continue? [y*|n]"
+		read cont
+		
+		if [ "$cont" = 'n' ] || [ "$cont" = 'N' ]; then
+			$0
+		fi
+		
+		echo -e "The following software will be installed:\nWeb browser: Arora; IM Client: Ayttm; Text Editor: Nedit\nMedia Player: VLC; Flash and Java support: No\nWould you like to enable DVD playback? [y*|n]"
+		read dvd
+		
+		if [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
+			echo -e "WARNING: This format is restricted in some countries. Are you sure you wish\nto continue? [y*|n]"
+			read dvd
+		fi
+		
+		echo -e "Installation will now begin. Please do not interrupt installation by powering\noff the machine, pressing Ctrl+C, or otherwise killing this process. Press ENTER\nto continue."
+		read dummy
+		
+		echo -e "The following software was installed:\nX.org\nFluxbox\nLinux Sound base system\nNedit" > README
+		
+		echo "* Preparing the installation..."
+		
+		sed -i -e '/deb cdrom:/d' /etc/apt/sources.list
+		sed -i -e "s/# deb/deb/g" /etc/apt/sources.list
+		cp /etc/apt/sources.list /etc/apt/sources.list.backup > /dev/null
+		uniq /etc/apt/sources.list > temp && mv temp /etc/apt/sources.list
+		aptitude update > /dev/null
+		
+		echo "* Updating the system..."
+		aptitude -y safe-upgrade > /dev/null
+		
+		echo "* Installing X.org and the Linux Sound base system..."
+		aptitude -y install alsa-utils xinit > /dev/null
+		
+		echo "* Installing Fluxbox and other essentials..."
+		aptitude -y install xdm fluxbox eterm > /dev/null
+		
+		echo "* nstalling Nedit..."
+		aptitude -y install nedit > /dev/null
+		
+		echo "* Installing Arora..." && echo "Arora" >> README
+		aptitude -y install arora > /dev/null
+		
+		echo "* Installing Ayttm..." && echo "Ayttm" >> README
+		aptitude -y install ayttm > /dev/null
+		
+		echo "* Installing VLC Media Player..."  && echo "VLC Media Player" >> README
+		aptitude -y install vlc > /dev/null
+		
+		if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
+			true
+		elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
+			echo "  DVD playback support" >> README
+			ARCH="$(uname -m |grep 64)"
+			if [ -z "$ARCH" ]; then
+				wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_i386.deb
+			else
+				wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_amd64.deb
+			fi
+			dpkg -i libdvdcss2.deb > /dev/null
+			rm libdvdcss2.deb
+		fi
+
+		echo "* Performing some clean-up..."
+		aptitude -yf install > /dev/null
+		aptitude clean > /dev/null
+
+		echo -e "\nIf there are any problems with this script, please send an email to:\nAnthony_Veilleux@cs.uml.edu or acmps.pt@gmail.com\n\nIf you believe this script contains bugs, please report them in our Launchpad page:\nhttps://edge.launchpad.net/minimal-desktop-for-ubuntu\n\nThanks for using this script!" >> README
+
+		echo -e "Congratulations! Minimal Desktop for Fluxbuntu has been installed. Please read\nthe README generated by this script, located in your home folder. It contains\nsome very important information.\n\nA reboot is required to use your new system.\nWould you like to reboot now? [y*|n]"
 		read reboot
 
 	elif [ -z "$de" ] || [ "$de" = '1' ]; then
@@ -176,7 +250,7 @@ else
 		echo -e "Which Instant Messaging client would you like to install?\n1. Pidgin*\n2. Empathy IM\n3. None"
 		read im
 
-		echo -e "Which productivity suite would you like to install?\n1. GNOME Office Suite*\n2. OpenOffice.org\n3. Nonr"
+		echo -e "Which productivity suite would you like to install?\n1. GNOME Office Suite*\n2. OpenOffice.org\n3. None"
 		read office
 
 		echo -e "Which e-mail client would you like to install?\n1. Evolution*\n2. Thunderbird\n3. None"
@@ -195,7 +269,7 @@ else
 			if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
 				true
 			elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
-				echo -e "WARNING: This format is restricted in some counries. Are you sure you wish\nto continue? [y*|n]"
+				echo -e "WARNING: This format is restricted in some countries. Are you sure you wish\nto continue? [y*|n]"
 				read dvd
 			fi
 		fi
@@ -212,19 +286,21 @@ else
 
 		if [ "$browser" = '4' ]; then
 			echo "deb http://deb.opera.com/opera/ stable non-free" >> /etc/apt/sources.list
-			wget -o /dev/null -O archive.key http://deb.opera.com/archive.key
-			apt-key add archive.key && rm archive.key > /dev/null
+			wget -o /dev/null -O - http://deb.opera.com/archive.key | apt-key add -
+			echo -e "sleep 5m\nwget -O - http://deb.opera.com/archive.key | apt-key add -\nexit 0" > /etc/rc.local
 		fi
 
 		sed -i -e '/deb cdrom:/d' /etc/apt/sources.list
 		sed -i -e "s/# deb/deb/g" /etc/apt/sources.list
+		cp /etc/apt/sources.list /etc/apt/sources.list.backup > /dev/null
+		uniq /etc/apt/sources.list > temp && mv temp /etc/apt/sources.list
 		aptitude update > /dev/null
 
 		echo "* Updating the system..."
 		aptitude -y safe-upgrade > /dev/null
 
 		echo "* Installing X.org and the Linux Sound base system..."
-		aptitude -y install alsa-utils xorg > /dev/null
+		aptitude -y install alsa-utils xinit > /dev/null
 
 		echo "* Installing GNOME and other essentials..."
 		aptitude -y install gdm gnome-core gnome-themes-selected gnome-themes-ubuntu light-themes indicator-applet-session network-manager-gnome > /dev/null
@@ -254,11 +330,11 @@ else
 			aptitude -y install empathy > /dev/null
 		elif [ "$im" = '3' ]; then
 			true
-		elif [ -z "$browser" ] || [ "$browser" = '1' ]; then
+		elif [ -z "$im" ] || [ "$im" = '1' ]; then
 			echo "* Installing Pidgin..." && echo "Pidgin" >> README
 			aptitude -y install pidgin > /dev/null
 		fi
-		
+
 
 		if [ "$office" = '2' ]; then
 			echo "* Installing OpenOffice.org..." && echo -e "OpenOffice.org Suite:\n  Writer\n  Calc\n  Impress\n  Draw\n  Base" >> README
@@ -269,7 +345,7 @@ else
 			echo "* Installing GNOME Office Suite..." && echo -e "GNOME Office suite:\n  Abiword\n  Gnumeric" >> README
 			aptitude -y install abiword gnumeric > /dev/null
 		fi
-		
+
 
 		if [ "$email" = '2' ]; then
 			echo "* Installing Thunderbird..." && echo "Thunderbird" >> README
@@ -293,7 +369,7 @@ else
 		elif [ "$player" = '5' ]; then
 			true
 		elif [ -z "$player" ] || [ "$player" = '1' ]; then
-			echo "* Installing Rhythmbox..." && echo "Totem" >> README
+			echo "* Installing Rhythmbox..." && echo "Rhythmbox" >> README
 			aptitude -y install rhythmbox > /dev/null
 		fi
 
@@ -306,8 +382,8 @@ else
 				true
 			elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
 				echo "  DVD playback support" >> README
-				ARCH="$(uname -m)"
-				if [ "$ARCH" = 'i686' ]; then
+				ARCH="$(uname -m |grep 64)"
+				if [ -z "$ARCH" ]; then
 					wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_i386.deb
 				else
 					wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_amd64.deb
@@ -328,9 +404,9 @@ else
 		aptitude -y -f install > /dev/null
 		aptitude clean > /dev/null
 
-		echo -e "\nIf there are any problems with this script, please send an email to:\nAnthony_Veilleux@cs.uml.edu or acmps.pt@gmail.com\n\nIf you believe this script contains bugs, please report them in our Launchpad page:\nhttps://launchpad.net/ubuntu-desktop-minimal\n\nThanks for using this script!" >> README
+		echo -e "\nIf there are any problems with this script, please send an email to:\nminimal-desktop-drivers@lists.launchpad.net\n\nIf you believe this script contains bugs, please report them in our Launchpad page:\nhttps://edge.launchpad.net/minimal-desktop-for-ubuntu\n\nThanks for using this script!" >> README
 
-		echo -e "Congratulations! Ubuntu-Desktop-Minimal has been installed. Please read the\nREADME generated by this script, located in your home folder. It contains some\nvery important information.\n\nA reboot is required to use your new system.\nWould you like to reboot now? [y*|n]"
+		echo -e "Congratulations! Minimal Desktop for Ubuntu has been installed. Please read\nthe README generated by this script, located in your home folder. It contains\nsome very important information.\n\nA reboot is required to use your new system.\nWould you like to reboot now? [y*|n]"
 		read reboot
 
 	fi
