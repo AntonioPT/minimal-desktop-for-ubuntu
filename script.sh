@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Minimal Desktop for Ubuntu 10.10 "Attobuntu" by the Minimal Desktop Team
-## Version 10.10-2010.10.06
+## Version 10.10-2010.10.10
 ## This script is licensed under GPL 3 (http://www.gnu.org/licenses/gpl-3.0.txt)
 ## http://ubuntu-minimal-desktop.blogspot.com/
 
@@ -75,7 +75,7 @@ else
 		sudo aptitude -y install kdm kdebase > /dev/null
 
 		echo "* Installing some important software..."
-		sudo aptitude -y install k3b kpackagekit kdeartwork jockey-kde okular > /dev/null
+		sudo aptitude -y install k3b kpackagekit kdeartwork kterm jockey-kde okular > /dev/null
 		sudo aptitude -yR install kdeutils > /dev/null
 
 		if [ "$browser" = '2' ]; then
@@ -88,7 +88,7 @@ else
 			echo "* Installing Opera..." && echo "Opera" >> README
 			aptitude -y install opera > /dev/null
 		elif [ -z "$browser" ] || [ "$browser" = '1' ]; then
-			aptitude -y install reconq > /dev/null
+			aptitude -y install rekonq > /dev/null
 		fi
 		
 
