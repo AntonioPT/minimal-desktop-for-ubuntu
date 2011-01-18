@@ -1,17 +1,18 @@
 #!/bin/bash
-## Minimal Desktop for Ubuntu 10.10.1 "Attobuntu Update 1" by the Minimal Desktop Team
-## Version 11.18-2010.10.10.1
+## Minimal Desktop for Ubuntu 10.10.2 "Attobuntu Update 2" by the Minimal Desktop Team
+## Version 10.10.2-2011.01.18
 ## This script is licensed under GPL 3 (http://www.gnu.org/licenses/gpl-3.0.txt)
 ## http://ubuntu-minimal-desktop.blogspot.com/
 
 if [ $UID -ne 0 ]; then
 	sudo $0
+	exit 0
 else
 
 	echo -e "Welcome to the Minimal Desktop for Ubuntu install script.\nI will now ask you some questions, to determine what software I should install.\nItems marked with an asterisk (*) are the default options.\nPress ENTER to continue."
 	read dummy
 
-	echo -e "Which desktop environment would you like to install? If you do not know what\nthis means just hit Enter.\n1. GNOME*\n2. KDE\n3. Fluxbox"
+	echo -e "Which desktop environment would you like to install? If you do not know what\nthis means just hit Enter.\n1. GNOME*\n2. KDE\n3. Flux/Black/Openbox"
 	read de
 
 	if [ "$de" = '2' ]; then
@@ -64,9 +65,7 @@ else
 
 		sed -i -e '/deb cdrom:/d' /etc/apt/sources.list
 		sed -i -e "s/# deb/deb/g" /etc/apt/sources.list
-		cp /etc/apt/sources.list /etc/apt/sources.list.backup > /dev/null
-		uniq /etc/apt/sources.list > temp && mv temp /etc/apt/sources.list
-		apt-key adv --keyserver keyserver.ubuntu.com --recv 3E5C1192
+		apt-key adv --keyserver keyserver.ubuntu.com --recv 3E5C1192 > /dev/null
 		aptitude update > /dev/null
 
 		echo "* Updating the system..."
@@ -176,66 +175,127 @@ else
 
 	elif [ "$de" = '3' ]; then
 
-		echo -e "Minimal Desktop for Fluxbuntu is recommended for experienced Linux users only.\nAre you sure you wish to continue? [y*|n]"
+		echo -e "Minimal Desktop for Ubuntu using *box is recommended for experienced Linux users\nonly. Are you sure you wish to continue? [y*|n]"
 		read cont
 		
 		if [ "$cont" = 'n' ] || [ "$cont" = 'N' ]; then
 			$0
+			exit 0
 		fi
-		
-		echo -e "The following software will be installed:\nWeb browser: Arora; IM Client: Ayttm; Text Editor: Nedit\nMedia Player: VLC; Flash and Java support: No\nWould you like to enable DVD playback? [y*|n]"
-		read dvd
-		
-		if [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
-			echo -e "WARNING: This format is restricted in some countries. Are you sure you wish\nto continue? [y*|n]"
+
+		echo -e "Which *box environment would you like to install?\n1. Fluxbox*\n2. Openbox\n3. Blackbox"
+		read boxenv
+
+		echo -e "Which browser would you like to install?\n1. Midori*\n2. Arora\n3. Chromium"
+		read browser
+
+		echo -e "Which Instant Messaging client would you like to install?\n1. Ayttm*\n2. SOMETHING!!!\n3. None"
+		read im
+
+		echo -e "Which e-mail client would you like to install?\n1. Sylpheed*\n2. Claws\n3. None"
+		read email
+
+		echo -e "Which media player would you like to install?\n1. VLC*\n2. Audacious\n3. MPlayer\n4. Quod Libet\n5. None"
+		read player
+
+		echo -e "Do you want to install restricted software, including Flash player\nand Java? [y*|n]"
+		read restrict
+		if [ "$restrict" = 'n' ] || [ "$restrict" = 'N' ]; then
+			true
+		elif [ -z "$restrict" ] || [ "$restrict" = 'y' ] || [ "$restrict" = 'Y' ]; then
+			echo "Do you want to enable DVD playback support? [y*|n]"
 			read dvd
+			if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
+				true
+			elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
+				echo -e "WARNING: This format is restricted in some countries. Are you sure you wish\nto continue? [y*|n]"
+				read dvd
+			fi
 		fi
-		
+
 		echo -e "Installation will now begin. Please do not interrupt installation by powering\noff the machine, pressing Ctrl+C, or otherwise killing this process. Press ENTER\nto continue."
 		read dummy
-		
-		echo -e "The following software was installed:\nX.org\nFluxbox\nLinux Sound base system\nNedit" > README
-		
+
+		echo -e "The following software was installed:\nX.org\nLinux Sound base system\nNedit" > README
+
 		echo "* Preparing the installation..."
-		
+
 		sed -i -e '/deb cdrom:/d' /etc/apt/sources.list
 		sed -i -e "s/# deb/deb/g" /etc/apt/sources.list
-		apt-key adv --keyserver keyserver.ubuntu.com --recv 3E5C1192
+		apt-key adv --keyserver keyserver.ubuntu.com --recv 3E5C1192 > /dev/null
 		aptitude update > /dev/null
-		
+
 		echo "* Updating the system..."
 		aptitude -y safe-upgrade > /dev/null
 		
 		echo "* Installing X.org and the Linux Sound base system..."
 		aptitude -y install alsa-utils xinit > /dev/null
+
+		if [ "$boxenv" = '2' ]; then
+			echo "* Installing Openbox and other essentials..." && echo "Openbox" >> README
+			aptitude -y install xdm openbox nedit > /dev/null
+		elif [ "$boxenv" = '3' ]; then
+			echo "* Installing Blackbox and other essentials..." && echo "Blackbox" >> README
+			aptitude -y install xdm blackbox nedit > /dev/null
+		elif [ -z "$boxenv" ] || [ "$boxenv" = '1' ]; then
+			echo "* Installing Fluxbox and other essentials..." && echo "Fluxbox" >> README
+			aptitude -y install xdm fluxbox eterm nedit > /dev/null
+		fi
 		
-		echo "* Installing Fluxbox and other essentials..."
-		aptitude -y install xdm fluxbox eterm > /dev/null
-		
-		echo "* nstalling Nedit..."
-		aptitude -y install nedit > /dev/null
-		
-		echo "* Installing Arora..." && echo "Arora" >> README
-		aptitude -y install arora > /dev/null
-		
-		echo "* Installing Ayttm..." && echo "Ayttm" >> README
-		aptitude -y install ayttm > /dev/null
-		
-		echo "* Installing VLC Media Player..."  && echo "VLC Media Player" >> README
-		aptitude -y install vlc > /dev/null
-		
-		if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
+		if [ "$im" = '2' ]; then
+			echo "* Installing SOMETHING..." && echo "SOMETHING" >> README
+			aptitude -y install nedit > /dev/null
+		elif [ "$im" = '3' ]; then
 			true
-		elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
-			echo "  DVD playback support" >> README
-			ARCH="$(uname -m |grep 64)"
-			if [ -z "$ARCH" ]; then
-				wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_i386.deb
-			else
-				wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_amd64.deb
+		elif [ -z "$im" ] || [ "$im" = '1' ]; then
+			echo "* Installing Ayttm..." && echo "Ayttm" >> README
+			aptitude -y install ayttm > /dev/null
+		fi
+
+		if [ "$email" = '2' ]; then
+			echo "* Installing Claws..." && echo "Claws" >> README
+			aptitude -y install claws-mail > /dev/null
+		elif [ "$email" = '3' ]; then
+			true
+		elif [ -z "$email" ] || [ "$email" = '1' ]; then
+			echo "* Installing Sylpheed..." && echo "Sylpheed" >> README
+			aptitude -y install sylpheed > /dev/null
+		fi
+
+		if [ "$player" = '2' ]; then
+			echo "* Installing Audacious..." && echo "Audacious" >> README
+			aptitude -y install audacious > /dev/null
+		elif [ "$player" = '3' ]; then
+			echo "* Installing MPlayer..." && echo "MPlayer" >> README
+			aptitude -y install mplayer > /dev/null
+		elif [ "$player" = '4' ]; then
+			echo "* Installing Quod Libet..." && echo "Quod Libet" >> README
+			aptitude -y install quodlibet > /dev/null
+		elif [ "$player" = '5' ]; then
+			true
+		elif [ -z "$player" ] || [ "$player" = '1' ]; then
+			echo "* Installing VLC..." && echo "VLC" >> README
+			aptitude -y install vlc > /dev/null
+		fi
+
+		if [ "$restrict" = 'n' ] || [ "$restrict" = 'N' ]; then
+			true
+		elif [ -z "$restrict" ] || [ "$restrict" = 'y' ] || [ "$restrict" = 'Y' ]; then
+			echo "* Installing restricted extras..." && echo "Ubuntu restricted extras" >> README
+			aptitude -y install ubuntu-restricted-extras > /dev/null
+			if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
+				true
+			elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
+				echo "  DVD playback support" >> README
+				ARCH="$(uname -m |grep 64)"
+				if [ -z "$ARCH" ]; then
+					wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_i386.deb
+				else
+					wget -o /dev/null -O libdvdcss2.deb http://packages.medibuntu.org/pool/free/libd/libdvdcss/libdvdcss2_1.2.10-0.3medibuntu1_amd64.deb
+				fi
+				dpkg -i libdvdcss2.deb > /dev/null
+				rm libdvdcss2.deb
 			fi
-			dpkg -i libdvdcss2.deb > /dev/null
-			rm libdvdcss2.deb
 		fi
 
 		echo "* Performing some clean-up..."
@@ -298,7 +358,7 @@ else
 
 		sed -i -e '/deb cdrom:/d' /etc/apt/sources.list
 		sed -i -e "s/# deb/deb/g" /etc/apt/sources.list
-		apt-key adv --keyserver keyserver.ubuntu.com --recv 3E5C1192
+		apt-key adv --keyserver keyserver.ubuntu.com --recv 3E5C1192 > /dev/null
 		aptitude update > /dev/null
 
 		echo "* Updating the system..."
