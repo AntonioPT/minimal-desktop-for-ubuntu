@@ -79,7 +79,7 @@ else
 
 		echo "* Installing some important software..."
 		sudo aptitude -y install k3b kpackagekit kdeartwork kterm jockey-kde okular > /dev/null
-		sudo aptitude -yR install kdeutils > /dev/null
+		sudo aptitude -yR install kdeutils udev > /dev/null
 
 		if [ "$browser" = '2' ]; then
 			echo "* Installing Firefox..." && echo "Firefox" >> README
@@ -146,7 +146,7 @@ else
 			true
 		elif [ -z "$restrict" ] || [ "$restrict" = 'y' ] || [ "$restrict" = 'Y' ]; then
 			echo "* Installing restricted extras..." && echo "Kubuntu restricted extras" >> README
-			aptitude -y install kubuntu-restricted-extras libdvdread4 > /dev/null
+			aptitude -y install kbuntu-restricted-addons lame libavcodec-extra-52 libmp3lame0 unrar > /dev/null
 			if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
 					true
 				elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
@@ -241,6 +241,17 @@ else
 			echo "* Installing Fluxbox and other essentials..." && echo "Fluxbox" >> README
 			aptitude -y install xdm fluxbox eterm nedit > /dev/null
 		fi
+
+		if [ "$browser" = '2' ]; then
+			echo "* Installing Arora..." && echo "Arora" >> README
+			aptitude -y install arora > /dev/null
+		elif [ "$browser" = '3' ]; then
+			echo "* Installing Chromium..." && echo "Chromium" >> README
+			aptitude -y install chromium-browser > /dev/null
+		elif [ -z "$browser" ] || [ "$browser" = '1' ]; then
+			echo "* Installing Midori..." && echo "Midori" >> README
+			aptitude -y install midori > /dev/null
+		fi
 		
 		if [ "$im" = '2' ]; then
 			echo "* Installing Instantbird..." && echo "Instantbird" >> README
@@ -282,7 +293,7 @@ else
 			true
 		elif [ -z "$restrict" ] || [ "$restrict" = 'y' ] || [ "$restrict" = 'Y' ]; then
 			echo "* Installing restricted extras..." && echo "Ubuntu restricted extras" >> README
-			aptitude -y install ubuntu-restricted-extras > /dev/null
+			aptitude -y install ubuntu-restricted-addons gstreamer0.10-plugins-bad-multiverse gstreamer0.10-plugins-ugly-multiverse libavcodec-extra-52 libmp4v2-0 unrar > /dev/null
 			if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
 				true
 			elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
@@ -452,7 +463,7 @@ else
 			true
 		elif [ -z "$restrict" ] || [ "$restrict" = 'y' ] || [ "$restrict" = 'Y' ]; then
 			echo "* Installing restricted extras..." && echo "Ubuntu restricted extras" >> README
-			aptitude -y install ubuntu-restricted-extras > /dev/null
+			aptitude -y install ubuntu-restricted-addons gstreamer0.10-plugins-bad-multiverse gstreamer0.10-plugins-ugly-multiverse libavcodec-extra-52 libmp4v2-0 unrar > /dev/null
 			if [ "$dvd" = 'n' ] || [ "$dvd" = 'N' ]; then
 				true
 			elif [ -z "$dvd" ] || [ "$dvd" = 'y' ] || [ "$dvd" = 'Y' ]; then
