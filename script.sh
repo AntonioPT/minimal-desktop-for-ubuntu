@@ -189,7 +189,7 @@ else
 		echo -e "Which browser would you like to install?\n1. Midori*\n2. Arora\n3. Chromium"
 		read browser
 
-		echo -e "Which Instant Messaging client would you like to install?\n1. Ayttm*\n2. SOMETHING!!!\n3. None"
+		echo -e "Which Instant Messaging client would you like to install?\n1. Ayttm*\n2. Instantbird\n3. None"
 		read im
 
 		echo -e "Which e-mail client would you like to install?\n1. Sylpheed*\n2. Claws\n3. None"
@@ -243,8 +243,8 @@ else
 		fi
 		
 		if [ "$im" = '2' ]; then
-			echo "* Installing SOMETHING..." && echo "SOMETHING" >> README
-			aptitude -y install nedit > /dev/null
+			echo "* Installing Instantbird..." && echo "Instantbird" >> README
+			aptitude -y install instantbird > /dev/null
 		elif [ "$im" = '3' ]; then
 			true
 		elif [ -z "$im" ] || [ "$im" = '1' ]; then
